@@ -29,12 +29,42 @@ with col3:
 
 working_years = retirement_age-age
 retirement_years = life_expectancy-retirement_age
+rows = working_years+retirement_years
+
+def incomes(t):
+    return (1+(t*inflation_rate/100))
+
+incomes = []
+incomes.append(income)
+
+df = pd.DataFrame({'Time': [x for x in range(rows)],
+                    'Age': [age + x for x in range(rows)],
+                    'Goal income': [income*(1+(inflation_rate/100))**t for t in range(rows)]})
+
+nest_egg = npf.npv((return_rate-inflation_rate)/100, df.loc[40:69, 'Goal income'])
+st.write("Your nextegg target is ${:,.2f}".format(nest_egg))
+annual_payment = npf.pmt((return_rate-inflation_rate)/100, working_years, 
+                            currently_saved, -nest_egg)
+monthly_payment = annual_payment/12
+st.write("You will need to save ${:,.2f}".format(monthly_payment))
 
 
-df = pd.DataFrame({'Time': [x for x in range(working_years+retirement_years)],
-                    'Age': [age + x for x in range(working_years+retirement_years)],
-                    'Goal income': [income*(1+(inflation_rate/100))* x for x in range(working_years+retirement_years)]})
+#df = pd.DataFrame({'PV': [x], 'y': [y] , 'x + y': [x + y]}, index = ['addition row'])
+#st.write(df)
+
 st.write(df)
+
+#'income': [income+incomes(x) if x<rows else 0 for x in range(rows)
+#def income(t):
+#    return (t*0.0315 + t**2*-0.00062)*60_000
+
+#'income': [income_start+income(x) if x<years else 0 for x in range(years+retirement_years)]
+
+#for i in range(num_rows):
+#    df.loc[i, 'income_next_year'] = df.loc[i, 'income'] * (1 + df.loc[i, 'inflation_rate'])
+
+#df['income_next_year'] = df['income'].iloc[0] + df['income'].iloc[0] * df['inflation_rate'].cumsum()
+
 
 #    def income(t):
  #       return (t*0.0315 + t**2*-0.00062)*60_000

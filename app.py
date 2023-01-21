@@ -7,7 +7,7 @@ import numpy_financial as npf
 
 st.title('Retirment Calculator')
 
-
+st.write("Checkout the Github [Repository](https://github.com/patrickneyland/retirement-calculator)")
 import streamlit as st
 
 col1, col2, col3 = st.columns(3)
@@ -41,7 +41,7 @@ df = pd.DataFrame({'Time': [x for x in range(rows)],
                     'Age': [age + x for x in range(rows)],
                     'Goal income': [income*(1+(inflation_rate/100))**t for t in range(rows)]})
 
-nest_egg = npf.npv((return_rate-inflation_rate)/100, df.loc[40:69, 'Goal income'])
+nest_egg = npf.npv((return_rate-inflation_rate)/100, df.loc[working_years:working_years+retirement_years, 'Goal income'])
 st.write("Your nextegg target is ${:,.2f}".format(nest_egg))
 annual_payment = npf.pmt((return_rate-inflation_rate)/100, working_years, 
                             currently_saved, -nest_egg)

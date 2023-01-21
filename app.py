@@ -9,7 +9,7 @@ income = st.number_input("Enter you desired income in retirement in today's doll
 pmt = st.number_input('Enter monthly contribution', 100,1000000,100)
 
 #st.write(f'Hello {name}!')
-x = npf.fv(.1,retirement_age-age,pmt)
+x = npf.fv(.1,retirement_age-age,-pmt,0)
 y = st.slider('Select an integer y', 0, 10, 1)
 df = pd.DataFrame({'PV': [x], 'y': [y] , 'x + y': [x + y]}, index = ['addition row'])
 st.write(df)

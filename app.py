@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import numpy_financial as npf
+#import numpy_financial as npf
 
 st.title('Retirment Calculator')
 name = st.text_input('Enter your name', '')

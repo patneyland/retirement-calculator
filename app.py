@@ -42,11 +42,11 @@ df = pd.DataFrame({'Time': [x for x in range(rows)],
                     'Goal income': [income*(1+(inflation_rate/100))**t for t in range(rows)]})
 
 nest_egg = npf.npv((return_rate-inflation_rate)/100, df.loc[working_years:working_years+retirement_years, 'Goal income'])
-st.write("Your nextegg target is ${:,.2f}".format(nest_egg))
+st.write("Your nestegg target is ${:,.2f}".format(nest_egg))
 annual_payment = npf.pmt((return_rate-inflation_rate)/100, working_years, 
                             currently_saved, -nest_egg)
 monthly_payment = annual_payment/12
-st.write("You will need to save ${:,.2f}".format(monthly_payment))
+st.write("Monthy will need to save ${:,.2f}".format(monthly_payment)"to reach you nestegg goal.")
 
 
 #df = pd.DataFrame({'PV': [x], 'y': [y] , 'x + y': [x + y]}, index = ['addition row'])

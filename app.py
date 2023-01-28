@@ -4,11 +4,10 @@ import numpy_financial as npf
 
 
 
-
+#setting up the web application
 st.title('Retirment Calculator')
-
 st.write("Checkout the Github [Repository](https://github.com/patrickneyland/retirement-calculator)")
-import streamlit as st
+
 
 col1, col2, col3 = st.columns(3)
 
@@ -30,6 +29,8 @@ with col3:
 working_years = retirement_age-age
 retirement_years = life_expectancy-retirement_age
 rows = working_years+retirement_years
+snp_rates = pd.read_csv("S&P500 Historical Annual Returns.csv")
+
 
 def incomes(t):
     return (1+(t*inflation_rate/100))
@@ -39,9 +40,15 @@ incomes.append(income)
 
 df = pd.DataFrame({'Time': [x for x in range(rows)],
                     'Age': [age + x for x in range(rows)],
-                    'Goal income': [income*(1+(inflation_rate/100))**t for t in range(rows)]})
+                    'Goal income num': [round(income*(1+(inflation_rate/100))**t) for t in range(rows)],
+                    'S&P500 Year' : snp_rates['Year'].head(rows),
+                    'S&P500 Historical Returns' : snp_rates['Annual Return'].head(rows)})
 
-nest_egg = npf.npv((return_rate-inflation_rate)/100, df.loc[working_years:working_years+retirement_years, 'Goal income'])
+df['Goal income'] = df['Goal income num'].apply(lambda x: "${:,}".format(x))
+#df['Goal income'] = df['Goal income'].apply(lambda x: "${:,.2f}".format(x))
+
+
+nest_egg = npf.npv((return_rate-inflation_rate)/100, df.loc[working_years:working_years+retirement_years, 'Goal income num'])
 st.write("Your nestegg target is ${:,.2f}".format(nest_egg))
 annual_payment = npf.pmt((return_rate-inflation_rate)/100, working_years, 
                             currently_saved, -nest_egg)
@@ -49,39 +56,7 @@ monthly_payment = annual_payment/12
 st.write("You will need to save ${:,.2f}".format(monthly_payment)+" every month to reach you nestegg goal.")
 
 
-#df = pd.DataFrame({'PV': [x], 'y': [y] , 'x + y': [x + y]}, index = ['addition row'])
 #st.write(df)
-
-st.write(df)
-
-#'income': [income+incomes(x) if x<rows else 0 for x in range(rows)
-#def income(t):
-#    return (t*0.0315 + t**2*-0.00062)*60_000
-
-#'income': [income_start+income(x) if x<years else 0 for x in range(years+retirement_years)]
-
-#for i in range(num_rows):
-#    df.loc[i, 'income_next_year'] = df.loc[i, 'income'] * (1 + df.loc[i, 'inflation_rate'])
-
-#df['income_next_year'] = df['income'].iloc[0] + df['income'].iloc[0] * df['inflation_rate'].cumsum()
-
-
-#    def income(t):
- #       return (t*0.0315 + t**2*-0.00062)*60_000
-#
-  #  data = {'Year': [2022 + x for x in range(years+retirement_years)],
- #           'Age': [age_start + x for x in range(years+retirement_years)],
- #           'income': [income_start+income(x) if x<years else 0 for x in range(years+retirement_years)],
-
-
-
-#pmt = st.number_input('Enter monthly contribution', 100,1000000,100)
-
-#st.write(f'Hello {name}!')
-#x = round(npf.fv(.1,working_years,-pmt,0),2)
-#y = st.slider('Select an integer y', 0, 10, 1)
-#st.title('At age 65, you will have...')
-#st.title(x)
-
-#df = pd.DataFrame({'PV': [x], 'y': [y] , 'x + y': [x + y]}, index = ['addition row'])
-#st.write(df)
+df_temp = df.copy()
+df_temp = df.drop(columns=['Goal income num'])
+st.write(df_temp)

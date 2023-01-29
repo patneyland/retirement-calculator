@@ -64,7 +64,7 @@ df['sdfg'] = df['Goal income num'].shift(-1)
 
 st.write("Your nestegg target is ${:,.2f}".format(nest_egg))
 st.write("You will need to save ${:,.2f}".format(annual_payment)+" every year to reach you nestegg goal.")
-st.write("This comes out to ${:,.2f}".format(monthly_payment)+"per month.")
+st.write("This comes out to ${:,.2f}".format(monthly_payment)+" per month.")
 
 
 #st.write(df)

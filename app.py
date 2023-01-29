@@ -77,15 +77,15 @@ graph = df['Goal income num'].plot()
 
 
 # select the column you want to plot
-data = df['Goal income num'][working_years:working_years+retirement_years]
+#data = df['Goal income num'][working_years:working_years+retirement_years]
 
 # create the plot
-plt.plot(data)
-plt.title('Goal Income over Lifetime')
-plt.xlabel('Years')
-plt.ylabel('Dollars')
-plt.yticks([100_000, 200_000, 300_000, 400_000, 500_000])
-plt.xticks([10, 20, 30, 40, 50])
+#plt.plot(data)
+#plt.title('Goal Income over Lifetime')
+#plt.xlabel('Years')
+#plt.ylabel('Dollars')
+#plt.yticks([100_000, 200_000, 300_000, 400_000, 500_000])
+#plt.xticks([10, 20, 30, 40, 50])
 
 # display the plot in the Streamlit app
 #st.pyplot()

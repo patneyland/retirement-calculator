@@ -12,7 +12,7 @@ col1, col2, col3 = st.columns(3)
 with col1:
     age = st.number_input('Current age', 10,110,25)
     retirement_age = st.number_input('Expected retirement age', 10,110,65)
-    life_expectancy = st.number_input('Life expectancy', 10,120,95)
+    life_expectancy = st.number_input('Life expectancy', 10,120,90)
 
 with col2:
     withdrawal_amount = st.number_input("Income goal for retirement", 1000, 10000000, 50000, 1000)

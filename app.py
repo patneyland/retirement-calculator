@@ -46,7 +46,7 @@ nestegg = npf.pv(real_rate/12, retirement_years*12, -tax_adjusted_withdrawal_amo
 
 monthly_contributions = npf.pmt(real_rate/12, work_years*12, currently_saved, -nestegg)
 
-st.write("You are currently are expecting to work for {} years".format(work_years))
+st.write("You are currently expecting to work for {} years".format(work_years))
 st.write("Your nestegg target is ${:,.0f}".format(nestegg))
 st.write("You will need to invest ${:,.2f}".format(monthly_contributions)+" at the end of each month to reach your nestegg goal.")
 st.write("You will be able to withdraw ${:,.2f}".format(monthly_withdrawal_amount)+" of todays dollars per month after taxes are paid.")

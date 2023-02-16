@@ -19,7 +19,7 @@ with col2:
     currently_saved = st.number_input("Current savings investments", 0,10000000,0,1000)
 
 with col3:
-    rate = st.number_input("Expected rate of return", 0.0,100.00,6.00,0.10)/100
+    rate = st.number_input("Expected rate of return", 0.0,100.00,6.60,0.10)/100
     inflation = st.number_input("Expected inflation rate", 0.0,100.00,2.8,0.10)/100
 
 #calculating taxes based on retirement income
@@ -42,13 +42,12 @@ elif withdrawal_amount <= limit_2:
 else:
     tax_adjusted_withdrawal_amount = (withdrawal_amount-limit_2)/(1-rate_3) + limit_1/(1-rate_1) + (limit_2-limit_1)/(1-rate_2)
 
-nestegg = npf.pv(real_rate/12, retirement_years*12, -tax_adjusted_withdrawal_amount/12, currently_saved, when='begin')
+nestegg = npf.pv(real_rate/12, retirement_years*12, -tax_adjusted_withdrawal_amount/12, 0, when='begin')
 
-monthly_contributions = npf.pmt(real_rate/12, work_years*12, 0, -nestegg)
+monthly_contributions = npf.pmt(real_rate/12, work_years*12, currently_saved, -nestegg)
 
-st.write("Your tax adjusted withdrawal amount is ${:,.2f}".format(tax_adjusted_withdrawal_amount))
 st.write("You are currently are expecting to work for {} years".format(work_years))
-st.write("Your nestegg target is ${:,.2f}".format(nestegg))
+st.write("Your nestegg target is ${:,.0f}".format(nestegg))
 st.write("You will need to invest ${:,.2f}".format(monthly_contributions)+" at the end of each month to reach your nestegg goal.")
 st.write("You will be able to withdraw ${:,.2f}".format(monthly_withdrawal_amount)+" of todays dollars per month after taxes are paid.")
 

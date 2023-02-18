@@ -5,12 +5,15 @@ import numpy_financial as npf
 #setting up the web application
 st.title('A Better Retirment Calculator')
 st.write("Checkout the Github [Repository](https://github.com/patrickneyland/retirement-calculator) for this calculator.")
+
+
+
+
 st.write("This calculator is designed to help you determine how much you need to save for retirement \
     and how much you can withdraw from your nestegg each month.")
 
 my_expander = st.expander(label='Click here to expand explanations of the various assumptions')
 with my_expander:
-
     st.write("Rate of Return - The starting rate of return is based on the historical average of the S&P 500. If you invested money in the S&P500 in 1928, the money you would have today would reflect a 6.6% annual rate of return.")
     st.write("Inflation - The inflation rate in the United States averaged 3.29 percent from 1914 until 2023")
     st.write("Taxes - ")
@@ -29,20 +32,6 @@ with advanced_parameters:
     with cola2:
         limit_1 = st.number_input("limit 1", 0,10000000,50000,1000)
         limit_2 = st.number_input("limit 2", 0,10000000,100000,1000)
-        st.write("The numeric inputs above create the following tax brackets")
-
-
-    tax_table = {
-        'Income Range': ['Less than $50,000', 'Between $50,000 and $100,000', 'Greater than $100,000'],
-        'Tax Rate': ['25%', '30%', '35%']
-    }
-    data = {
-    'Income Range': [f'< ${limit_1}', f'Between ${limit_1} and ${limit_2}', f'Greater than ${limit_2}'],
-    'Tax Rate': [f'{rate_1*100}%', f'{rate_2*100}%', f'{rate_3*100}%']
-    }
-    df = pd.DataFrame(data)
-    st.table(df)
-
 
 col1, col2, col3 = st.columns(3)
 
@@ -58,6 +47,14 @@ with col2:
 with col3:
     rate = st.number_input("Expected rate of return", 0.0,100.00,6.60,0.10)/100
     inflation = st.number_input("Expected inflation rate", 0.0,100.00,3.3,0.10)/100
+
+# #calculating taxes based on retirement income
+# rate_1 = .25
+# rate_2 = .30
+# rate_3 = .35
+# #income limits for tax brackets
+# limit_1 = 50000
+# limit_2 = 100000
 
 real_rate = (1+rate)/(1+inflation)-1
 monthly_withdrawal_amount = withdrawal_amount/12

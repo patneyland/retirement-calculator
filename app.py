@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy_financial as npf
+import humanize
 
 #setting up the web application
 st.title('A Better Retirment Calculator')
@@ -29,18 +30,17 @@ with advanced_parameters:
     with cola2:
         limit_1 = st.number_input("limit 1", 0,10000000,50000,1000)
         limit_2 = st.number_input("limit 2", 0,10000000,100000,1000)
-        st.write("The numeric inputs above create the following tax brackets")
+        st.write("The numeric inputs above create the following tax brackets.")
 
+    income_range_1 = f'Less than ${humanize.intcomma(limit_1)}'
+    income_range_2 = f'Between ${humanize.intcomma(limit_1)} and ${humanize.intcomma(limit_2)}'
+    income_range_3 = f'Greater than ${humanize.intcomma(limit_2)}'
 
     tax_table = {
-        'Income Range': ['Less than $50,000', 'Between $50,000 and $100,000', 'Greater than $100,000'],
-        'Tax Rate': ['25%', '30%', '35%']
-    }
-    data = {
-    'Income Range': [f'< ${limit_1}', f'Between ${limit_1} and ${limit_2}', f'Greater than ${limit_2}'],
+    'Income Range': [income_range_1, income_range_2, income_range_3],
     'Tax Rate': [f'{rate_1*100}%', f'{rate_2*100}%', f'{rate_3*100}%']
     }
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(tax_table, columns = ['Income Range', 'Tax Rate'])
     st.table(df)
 
 
@@ -75,7 +75,7 @@ nestegg = npf.pv(real_rate/12, retirement_years*12, -tax_adjusted_withdrawal_amo
 
 monthly_contributions = npf.pmt(real_rate/12, work_years*12, currently_saved, -nestegg)
 
-st.write("You are currently expecting to work for {} more years".format(work_years))
-st.write("To meet retirment income expectations, your nestegg target is ${:,.0f}".format(nestegg))
+st.write("You are currently expecting to work for {} more years.".format(work_years))
+st.write("To meet retirment income expectations, your nestegg target is ${:,.0f}.".format(nestegg))
 st.write("You will need to invest ${:,.2f}".format(monthly_contributions)+" at the end of each month to reach your nestegg goal.")
 st.write("You will be able to withdraw ${:,.2f}".format(monthly_withdrawal_amount)+" of todays dollars per month after taxes are paid.")

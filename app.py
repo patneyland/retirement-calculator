@@ -56,7 +56,7 @@ with col2:
     currently_saved = st.number_input("Current savings investments", 0,10000000,0,1000)
 
 with col3:
-    rate = st.number_input("Expected rate of return", 0.0,100.00,6.60,0.10)/100
+    rate = st.number_input("Expected rate of return", 0.0,100.00,7.70,0.10)/100
     inflation = st.number_input("Expected inflation rate", 0.0,100.00,3.3,0.10)/100
 
 real_rate = (1+rate)/(1+inflation)-1

@@ -3,25 +3,30 @@ import pandas as pd
 import numpy_financial as npf
 import humanize
 import altair as alt
+import matplotlib.pyplot as plt
 
 # Setting up the web application
 st.title('A Better Retirement Calculator')
 st.write("This calculator is designed to help you determine how much you need to save for retirement \
     and how much you can withdraw from your nestegg each month.")
 
-my_expander = st.expander(label='Assumtions and other information')
-with my_expander:
-    st.write("Checkout the Github [Repository](https://github.com/patrickneyland/retirement-calculator) for this calculator.")
-    st.write("Rate of Return - The starting rate of return is based on the historical average of the S&P 500. If you invested money in the S&P500 in 1928, the money you would have today would reflect a 6.6% annual rate of return.")
-    st.write("Inflation - The inflation rate in the United States averaged 3.29 percent from 1914 until 2023")
-    st.write("Taxes - ")
-    st.write("Income in Retirement - ")
+nestegg_placeholder = st.empty()
+monthly_contributions_placeholder = st.empty()
 
 
 
+# my_expander = st.expander(label='Assumtions and other information')
+# with my_expander:
+#     st.write("Checkout the Github [Repository](https://github.com/patrickneyland/retirement-calculator) for this calculator.")
+#     st.write("Rate of Return - The starting rate of return is based on the historical average of the S&P 500. If you invested money in the S&P500 in 1928, the money you would have today would reflect a 6.6% annual rate of return.")
+#     st.write("Inflation - The inflation rate in the United States averaged 3.29 percent from 1914 until 2023")
+#     st.write("Taxes - ")
+#     st.write("Income in Retirement - ")
+#     st.write("Social Security - ")
 advanced_parameters = st.expander(label="Tax brackets")
 
 with advanced_parameters:
+    st.write("Scroll down and use the numeric inputs to adjust the tax rates and income limits to create the desired tax brackets.")
     df_placeholder = st.empty()
     filing_status = st.selectbox("Filing Status", ["Single", "Married Filing Jointly", "Married Filing Separately", "Head of Household"])
     cola1, cola2 = st.columns(2)
@@ -55,7 +60,7 @@ with advanced_parameters:
         limit_5 = st.number_input("limit 5", 0, 10000000, default_limits[4], 1000)
         limit_6 = st.number_input("limit 6", 0, 10000000, default_limits[5], 1000)
     
-    st.write("The numeric inputs above create the following tax brackets based on the selected filing status.")
+    
 
 
     income_range_1 = f'Less than ${humanize.intcomma(limit_1)}'
@@ -71,7 +76,6 @@ with advanced_parameters:
         'Tax Rate': [f'{rate_1 * 100}%', f'{rate_2 * 100}%', f'{rate_3 * 100}%', f'{rate_4 * 100}%', f'{rate_5 * 100}%', f'{rate_6 * 100}%', f'{rate_7 * 100}%']
     }
     df = pd.DataFrame(tax_table, columns=['Income Range', 'Tax Rate'])
-    st.table(df)
     df_placeholder.table(df)
 col1, col2, col3 = st.columns(3)
 
@@ -93,6 +97,8 @@ monthly_withdrawal_amount = withdrawal_amount / 12
 work_years = retirement_age - age
 retirement_years = life_expectancy - retirement_age
 
+# Calculate the tax-adjusted withdrawal amount
+
 if withdrawal_amount <= limit_1:
     tax_adjusted_withdrawal_amount = withdrawal_amount / (1 - rate_1)
 elif withdrawal_amount <= limit_2:
@@ -100,9 +106,15 @@ elif withdrawal_amount <= limit_2:
 else:
     tax_adjusted_withdrawal_amount = (withdrawal_amount - limit_2) / (1 - rate_3) + limit_1 / (1 - rate_1) + (limit_2 - limit_1) / (1 - rate_2)
 
+
+
 nestegg = npf.pv(real_rate / 12, retirement_years * 12, -tax_adjusted_withdrawal_amount / 12, 0, when='begin')
 
 monthly_contributions = npf.pmt(real_rate / 12, work_years * 12, currently_saved, -nestegg)
+
+nestegg_placeholder.title("Nestegg Target: ${:,.0f}".format(nestegg))
+monthly_contributions_placeholder.title("Monthly Contributions: ${:,.0f}".format(monthly_contributions))
+
 
 st.write("You are currently expecting to work for {} more years.".format(work_years))
 st.write("To meet retirement income expectations, your nestegg target is ${:,.0f}.".format(nestegg))
@@ -148,3 +160,12 @@ chart = alt.Chart(data).mark_line().encode(
 )
 
 st.altair_chart(chart, use_container_width=True)
+
+my_expander = st.expander(label='Assumtions and other information')
+with my_expander:
+    st.write("Checkout the Github [Repository](https://github.com/patrickneyland/retirement-calculator) for this calculator.")
+    st.write("Rate of Return - The starting rate of return is based on the historical average of the S&P 500. If you invested money in the S&P500 in 1928, the money you would have today would reflect a 6.6% annual rate of return.")
+    st.write("Inflation - The inflation rate in the United States averaged 3.29 percent from 1914 until 2023")
+    st.write("Taxes - ")
+    st.write("Income in Retirement - ")
+    st.write("Social Security - ")

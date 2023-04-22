@@ -4,6 +4,7 @@ import numpy_financial as npf
 import humanize
 import altair as alt
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Setting up the web application
 st.title('A Better Retirement Calculator')
@@ -13,16 +14,6 @@ st.write("This calculator is designed to help you determine how much you need to
 nestegg_placeholder = st.empty()
 monthly_contributions_placeholder = st.empty()
 
-
-
-# my_expander = st.expander(label='Assumtions and other information')
-# with my_expander:
-#     st.write("Checkout the Github [Repository](https://github.com/patrickneyland/retirement-calculator) for this calculator.")
-#     st.write("Rate of Return - The starting rate of return is based on the historical average of the S&P 500. If you invested money in the S&P500 in 1928, the money you would have today would reflect a 6.6% annual rate of return.")
-#     st.write("Inflation - The inflation rate in the United States averaged 3.29 percent from 1914 until 2023")
-#     st.write("Taxes - ")
-#     st.write("Income in Retirement - ")
-#     st.write("Social Security - ")
 advanced_parameters = st.expander(label="Tax brackets")
 
 with advanced_parameters:
@@ -60,9 +51,6 @@ with advanced_parameters:
         limit_5 = st.number_input("limit 5", 0, 10000000, default_limits[4], 1000)
         limit_6 = st.number_input("limit 6", 0, 10000000, default_limits[5], 1000)
     
-    
-
-
     income_range_1 = f'Less than ${humanize.intcomma(limit_1)}'
     income_range_2 = f'Between ${humanize.intcomma(limit_1)} and ${humanize.intcomma(limit_2)}'
     income_range_3 = f'Between ${humanize.intcomma(limit_2)} and ${humanize.intcomma(limit_3)}'
@@ -106,7 +94,7 @@ elif withdrawal_amount <= limit_2:
 else:
     tax_adjusted_withdrawal_amount = (withdrawal_amount - limit_2) / (1 - rate_3) + limit_1 / (1 - rate_1) + (limit_2 - limit_1) / (1 - rate_2)
 
-
+# calculate the nestegg target and monthly contributions
 
 nestegg = npf.pv(real_rate / 12, retirement_years * 12, -tax_adjusted_withdrawal_amount / 12, 0, when='begin')
 
@@ -121,45 +109,28 @@ st.write("To meet retirement income expectations, your nestegg target is ${:,.0f
 st.write("You will need to invest ${:,.2f}".format(monthly_contributions) + " at the end of each month to reach your nestegg goal.")
 st.write("You will be able to withdraw ${:,.2f}".format(monthly_withdrawal_amount) + " of today's dollars per month after taxes are paid.")
 
-# # Create a dataframe for the Altair chart
-# data = pd.DataFrame({'Year': range(age, life_expectancy + 1)})
-# data['Savings'] = [npf.fv(real_rate / 12, (year - age) * 12, -monthly_contributions, currently_saved) for year in data['Year']]
-# data['Withdrawals'] = [min(npf.pv(real_rate / 12, (life_expectancy - year) * 12, -tax_adjusted_withdrawal_amount / 12, 0, when='begin'), saving) for year, saving in zip(data['Year'], data['Savings'])]
+# # Calculate the savings and withdrawals for each year
+# # Calculate the retirement account balance for each year
+# years = list(range(age, life_expectancy + 1))
+# retirement_account_balance = []
 
-# # Create the Altair chart
-# chart = alt.Chart(data).mark_area(opacity=0.5).encode(
-#     alt.X('Year:Q', axis=alt.Axis(title='Age')),
-#     alt.Y('Savings:Q', axis=alt.Axis(title='Savings and Withdrawals')),
-#     alt.Color('key:N', legend=alt.Legend(title='Key')),
-#     order='key:N'
-# ).transform_fold(
-#     ['Savings', 'Withdrawals']
+# for year in years:
+#     if year < retirement_age:
+#         balance = npf.fv(rate / 12, (year - age) * 12, -monthly_contributions, currently_saved)
+#     else:
+#         balance = npf.fv(real_rate / 12, (year - retirement_age) * 12, -tax_adjusted_withdrawal_amount / 12, nestegg)
+#     retirement_account_balance.append(max(0, balance))
+
+# # Create a data frame to store the retirement account balance data
+# data = pd.DataFrame({'Year': years, 'Retirement Account Balance': retirement_account_balance})
+
+# # Create an Altair line chart to visualize the retirement account balance
+# chart = alt.Chart(data).mark_line().encode(
+#     x='Year:Q',
+#     y='Retirement Account Balance:Q'
 # )
 
 # st.altair_chart(chart, use_container_width=True)
-
-# Calculate the savings and withdrawals for each year
-# Calculate the retirement account balance for each year
-years = list(range(age, life_expectancy + 1))
-retirement_account_balance = []
-
-for year in years:
-    if year < retirement_age:
-        balance = npf.fv(rate / 12, (year - age) * 12, -monthly_contributions, currently_saved)
-    else:
-        balance = npf.fv(real_rate / 12, (year - retirement_age) * 12, -tax_adjusted_withdrawal_amount / 12, nestegg)
-    retirement_account_balance.append(max(0, balance))
-
-# Create a data frame to store the retirement account balance data
-data = pd.DataFrame({'Year': years, 'Retirement Account Balance': retirement_account_balance})
-
-# Create an Altair line chart to visualize the retirement account balance
-chart = alt.Chart(data).mark_line().encode(
-    x='Year:Q',
-    y='Retirement Account Balance:Q'
-)
-
-st.altair_chart(chart, use_container_width=True)
 
 my_expander = st.expander(label='Assumtions and other information')
 with my_expander:
@@ -169,3 +140,25 @@ with my_expander:
     st.write("Taxes - ")
     st.write("Income in Retirement - ")
     st.write("Social Security - ")
+
+retirement_months = int(retirement_years * 12)
+tax_adjusted_withdrawal = np.zeros(retirement_months)
+
+for i in range(retirement_months):
+    withdrawal = withdrawal_amount * (1 + inflation) ** (i / 12)
+    if withdrawal <= limit_1:
+        tax_adjusted_withdrawal[i] = withdrawal / (1 - rate_1)
+    elif withdrawal <= limit_2:
+        tax_adjusted_withdrawal[i] = (withdrawal - limit_1) / (1 - rate_2) + limit_1 / (1 - rate_1)
+    else:
+        tax_adjusted_withdrawal[i] = (withdrawal - limit_2) / (1 - rate_3) + limit_1 / (1 - rate_1) + (limit_2 - limit_1) / (1 - rate_2)
+
+# Create the chart
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, retirement_months + 1), tax_adjusted_withdrawal)
+plt.xlabel("Months into Retirement")
+plt.ylabel("Tax-Adjusted Withdrawal Amount ($)")
+plt.title("Tax-Adjusted Withdrawal Amount Over the Course of Retirement")
+
+# Display the chart using Streamlit
+st.pyplot(plt)
